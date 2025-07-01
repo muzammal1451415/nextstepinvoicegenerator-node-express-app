@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-size: 2.25rem;
+            font-weight: 700;
+        }
+        .filter-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background-color: #f9fafb;
+        }
+        .filter-section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #d1d5db;
+            padding-bottom: 10px;
+        }
+        .grid-cols-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        input[type="text"],
+        input[type="date"],
+        button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #374151;
+            background-color: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        button {
+            background-color: #4f46e5;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            border: none;
+        }
+        button:hover {
+            background-color: #4338ca;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        tr:nth-child(even) {
+            background-color: #fefefe;
+        }
+        tr:hover {
+            background-color: #f3f4f6;
+        }
+        .action-buttons button {
+            width: auto;
+            padding: 8px 12px;
+            margin-right: 8px;
+            font-size: 0.875rem;
+            border-radius: 6px;
+        }
+        .action-buttons .view-btn {
+            background-color: #3b82f6; /* blue-500 */
+        }
+        .action-buttons .view-btn:hover {
+            background-color: #2563eb; /* blue-600 */
+        }
+        .action-buttons .download-btn {
+            background-color: #10b981; /* emerald-500 */
+        }
+        .action-buttons .download-btn:hover {
+            background-color: #059669; /* emerald-600 */
+        }
+        #loading-indicator {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.125rem;
+            color: #6b7280;
+        }
+        #no-results {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.125rem;
+            color: #ef4444;
+            display: none; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="text-indigo-600 hover:underline mb-4 inline-block">&larr; Back to Main Menu</a>
+        <h1>Invoice History</h1>
+
+        <div class="filter-section">
+            <h2 class="filter-section-title">Filter Invoices</h2>
+            <div class="grid-cols-3">
+                <div>
+                    <label for="filterStartDate">Start Date:</label>
+                    <input type="date" id="filterStartDate">
+                </div>
+                <div>
+                    <label for="filterEndDate">End Date:</label>
+                    <input type="date" id="filterEndDate">
+                </div>
+                <div>
+                    <label for="filterCustomerName">Customer Name:</label>
+                    <input type="text" id="filterCustomerName" placeholder="e.g., Muzammal Abdul Ghafoor">
+                </div>
+                <div>
+                    <label for="filterCustomerPhone">Customer Phone:</label>
+                    <input type="text" id="filterCustomerPhone" placeholder="e.g., 0526626675">
+                </div>
+                <div class="col-span-full md:col-span-1 flex items-end">
+                    <button onclick="fetchInvoices()">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading-indicator">Loading invoices...</div>
+        <div id="no-results">No invoices found matching your criteria.</div>
+
+        <table id="invoiceTable">
+            <thead>
+                <tr>
+                    <th>Invoice #</th>
+                    <th>Date</th>
+                    <th>Customer Name</th>
+                    <th>Customer Phone</th>
+                    <th>Grand Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Invoice data will be loaded here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', fetchInvoices);
+
+        async function fetchInvoices() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const noResultsMessage = document.getElementById('no-results');
+            const invoiceTableBody = document.querySelector('#invoiceTable tbody');
+            
+            loadingIndicator.style.display = 'block';
+            noResultsMessage.style.display = 'none';
+            invoiceTableBody.innerHTML = ''; // Clear previous results
+
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+            const customerName = document.getElementById('filterCustomerName').value;
+            const customerPhone = document.getElementById('filterCustomerPhone').value;
+
+            const queryParams = new URLSearchParams();
+            if (startDate) queryParams.append('startDate', startDate);
+            if (endDate) queryParams.append('endDate', endDate);
+            if (customerName) queryParams.append('customerName', customerName);
+            if (customerPhone) queryParams.append('customerPhone', customerPhone);
+
+            try {
+                const response = await fetch(`/api/invoices?${queryParams.toString()}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const invoices = await response.json();
+
+                loadingIndicator.style.display = 'none';
+
+                if (invoices.length === 0) {
+                    noResultsMessage.style.display = 'block';
+                } else {
+                    invoices.forEach(invoice => {
+                        const row = invoiceTableBody.insertRow();
+                        // NeDB uses _id for the unique document ID
+                        row.innerHTML = `
+                            <td>${invoice.invoiceNumber || 'N/A'}</td>
+                            <td>${invoice.createdAt || 'N/A'}</td>
+                            <td>${invoice.customerName || 'N/A'}</td>
+                            <td>${invoice.customerPhone || 'N/A'}</td>
+                            <td>AED ${parseFloat(invoice.grandTotal || 0).toFixed(2)}</td>
+                            <td class="action-buttons">
+                                <button class="view-btn" onclick="viewInvoice('${invoice._id}')">View PDF</button>
+                                <button class="download-btn" onclick="downloadInvoice('${invoice._id}')">Download PDF</button>
+                            </td>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching invoices:', error);
+                loadingIndicator.style.display = 'none';
+                noResultsMessage.textContent = 'Error loading invoices. Please try again.';
+                noResultsMessage.style.display = 'block';
+            }
+        }
+
+        function viewInvoice(invoiceId) {
+            // Opens the PDF in a new tab
+            window.open(`/download-invoice/${invoiceId}`, '_blank');
+        }
+
+        function downloadInvoice(invoiceId) {
+            // Triggers a download
+            const link = document.createElement('a');
+            link.href = `/download-invoice/${invoiceId}`;
+            link.download = `invoice-${invoiceId}.pdf`; // Suggest a filename
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

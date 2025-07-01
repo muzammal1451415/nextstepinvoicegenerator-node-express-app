@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{mainTitle}}</title>
+  <style>
+    /* Base styles for the PDF output */
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif; /* Using Inter for consistency */
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      box-sizing: border-box; /* Include padding in element's total width and height */
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .bold {
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .arabic {
+      font-size: 18px;
+      display: inline-block;
+      direction: rtl;
+      margin-left: 10px;
+      font-weight: bold;
+    }
+
+    .arabic-heading {
+      font-size: 32px;
+      display: inline-block;
+      direction: rtl;
+    }
+
+    .flex-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    .flex-box {
+      width: 48%; /* Adjusted for responsiveness */
+      box-sizing: border-box;
+      padding: 5px; /* Add some padding */
+    }
+
+    @media (max-width: 600px) {
+      .flex-box {
+        width: 100%; /* Stack on small screens */
+      }
+    }
+
+    .section-title {
+      font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid #d1d5db;
+      padding-bottom: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border: 1px solid #ddd; /* Add border to the table */
+      border-radius: 8px; /* Rounded corners for the table */
+      overflow: hidden; /* Ensures rounded corners apply to content */
+    }
+
+    th, td {
+      padding: 10px 8px; /* Increased padding for better readability */
+      text-align: center;
+      border: 1px solid #ddd; /* Borders for cells */
+    }
+
+    thead th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .summary {
+      margin-top: 20px;
+      padding-bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .summary-table {
+      width: 400px;
+      border: 1px solid #000;
+      border-radius: 8px; /* Rounded corners for summary table */
+      overflow: hidden;
+    }
+
+    .summary-table td {
+      padding: 8px 10px;
+      text-align: left; /* Align text to left for labels */
+      border: none; /* No internal borders */
+    }
+
+    .summary-table td:last-child {
+      text-align: right; /* Align values to right */
+    }
+
+    .summary-table tr:last-child td {
+      font-weight: bold;
+      background-color: #f2f2f2;
+    }
+
+    .footer {
+      border-top: 2px solid #000;
+      margin-top: auto;
+      font-size: 14px;
+      text-align: center;
+      padding-top: 10px;
+      border-radius: 8px; /* Rounded corners for footer */
+    }
+
+    .footer-contact {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-english, .footer-arabic {
+      width: 48%; /* Adjusted for responsiveness */
+      line-height: 20px;
+      box-sizing: border-box;
+      padding: 5px;
+    }
+
+    .footer-english {
+      text-align: left;
+    }
+
+    .footer-arabic {
+      text-align: right;
+    }
+
+    @media (max-width: 600px) {
+      .footer-english, .footer-arabic {
+        width: 100%;
+        text-align: center; /* Center align on small screens */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div class="arabic-heading ">كراج نكست ستيب ذ.م.م <br><span class="bold">Next Step Garage LLC</span></div>
+      <!-- Image src points to your logo file in the same directory -->
+      <img src="image.png" alt="Company Logo" style="height: 60px; border-radius: 8px;">
+    </div>
+
+    <h2 style="text-align: center; font-size: 20px; margin-bottom: 20px;">{{mainTitle}}<br><span class="arabic">{{arabicMainTitle}}</span></h2>
+
+    <div class="flex-row">
+      <div class="flex-box">
+        <div class="section-title">Customer Details:<span class="arabic">تفاصيل العميل</span></div>
+        {{customerName}}<br>
+        Ph# {{customerPhone}}<br>
+        {{customerAddress}}
+      </div>
+      <div class="flex-box">
+        <div class="section-title">Invoice Information:<span class="arabic">معلومات الفاتورة</span></div>
+        Invoice# {{invoiceNumber}}<br>
+        Created at: {{createdAt}}<br>
+        Created by: {{createdBy}}
+      </div>
+    </div>
+
+    <div class="flex-row">
+      <div class="flex-box">
+        <div class="section-title">Vehicle Details:<span class="arabic">تفاصيل المركبة</span></div>
+        {{vehicleMakeModel}}<br>
+        VIN#{{vehicleVIN}}<br>
+        Reg#{{vehicleReg}}<br>
+        Milage: {{vehicleMileage}} KM
+      </div>
+      <div class="flex-box">
+        <div class="section-title">Vehicle Receiving:<span class="arabic">استلام السيارة</span></div>
+        Received by: {{receivedBy}}<br>
+        Received on: {{receivedOn}}
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Item description<br><span class="arabic">وصف السلعة</span></th>
+          <th>Qty<br><span class="arabic">كمية</span></th>
+          <th>Unit Price<br><span class="arabic">سعر الوحدة</span></th>
+          <th>VAT%<br><span class="arabic">ضريبة</span></th>
+          <th>VAT Amount<br><span class="arabic">قيمة الضريبة</span></th>
+          <th>Total<br><span class="arabic">المجموع</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Item rows will be dynamically inserted here -->
+        {{itemRows}}
+      </tbody>
+    </table>
+
+    <div class="summary">
+      <table class="summary-table">
+        <tr><td>Goods Total:<span class="arabic">إجمالي البضائع</span></td><td>AED {{goodsTotal}}</td></tr>
+        <tr><td>VAT(5%):<span class="arabic">ض.ق.م: (٪٥)</span></td><td>AED {{vatTotal}}</td></tr>
+        <tr><td>Discount(%):<span class="arabic">الخصم(٪)</span></td><td>{{discountPercent}}</td></tr>
+        <tr><td>Discount Price:<span class="arabic">سعر الخصم</span></td><td>{{discountAmount}}</td></tr>
+        <tr><td><strong>Grand Total:</strong><span class="arabic"><strong>المجموع الإجمالي</strong></span></td><td><strong>AED {{grandTotal}}</strong></td></tr>
+      </table>
+    </div>
+
+    <div class="footer">
+      <div class="footer-contact">
+        <div class="footer-english">
+          Next Step Garage LLC<br>
+          P.O.Box# 390196<br>
+          Al Quoz, Industrial Area 4, Dubai, UAE<br>
+          VAT TRN: 1005733355000003
+        </div>
+        <div class="footer-arabic">
+          شركة نكست ستيب جراج ذ.م.م<br>
+          ص.ب# 390196<br>
+          القدرة الصناعية 4، آل قوز، دبي، الإمارات العربية المتحدة<br>
+          رقم تسجيل الضريبة على القيمة المضافة: 1005733355000003
+        </div>
+      </div>
+      <div> Phone: +971 52 287 3322 |  Email: info@nextstepgarage.ae | Web: www.nextstepgaragedxb.com</div>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Step Garage</title>
+    <!-- Tailwind CSS CDN for quick styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            margin-top: 20px; /* Add some margin from the top */
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700; /* font-bold */
+        }
+        .form-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background-color: #f9fafb;
+        }
+        .form-section-title {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600; /* font-semibold */
+            color: #374151;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #d1d5db;
+            padding-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #374151;
+            background-color: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        textarea:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+        .grid-cols-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .item-row {
+            display: grid;
+            grid-template-columns: 0.5fr 3fr 1fr 1fr 1fr 1fr 1fr 0.5fr; /* Adjusted for delete button */
+            gap: 10px;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        .item-row input {
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .add-item-btn {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            margin-top: 15px;
+            display: block;
+            width: fit-content;
+        }
+        .add-item-btn:hover {
+            background-color: #16a34a; /* green-600 */
+        }
+        .delete-item-btn {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem; /* text-sm */
+            transition: background-color 0.2s;
+        }
+        .delete-item-btn:hover {
+            background-color: #dc2626; /* red-600 */
+        }
+        button[type="submit"] {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 700;
+            display: block;
+            width: 100%;
+            margin-top: 30px;
+            transition: background-color 0.2s;
+        }
+        button[type="submit"]:hover {
+            background-color: #4338ca; /* indigo-700 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Next Step Garage Invoice Generator</h1>
+        <form action="/generate-invoice" method="POST">
+            <div class="form-section">
+                <h2 class="form-section-title">Invoice Information</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="invoiceNumber">Invoice #:</label>
+                        <input type="text" id="invoiceNumber" name="invoiceNumber" value="INV-{{newInvoiceNum}}" required>
+                    </div>
+                    <div>
+                        <label for="createdAt">Created At:</label>
+                        <input type="date" id="createdAt" name="createdAt" value="{{currentDate}}" required>
+                    </div>
+                    <div>
+                        <label for="createdBy">Created By:</label>
+                        <input type="text" id="createdBy" name="createdBy" value="Noreen Ali" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Customer Details</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="customerName">Customer Name:</label>
+                        <input type="text" id="customerName" name="customerName" value="Mr. Muzammal Abdul Ghafoor" required>
+                    </div>
+                    <div>
+                        <label for="customerPhone">Phone #:</label>
+                        <input type="text" id="customerPhone" name="customerPhone" value="0526626675" required>
+                    </div>
+                    <div>
+                        <label for="customerAddress">Address:</label>
+                        <textarea id="customerAddress" name="customerAddress" rows="2" required>Dubai, United Arab Emirates</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Vehicle Details</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="vehicleMakeModel">Make/Model:</label>
+                        <input type="text" id="vehicleMakeModel" name="vehicleMakeModel" value="Nissan Patrol 2015" required>
+                    </div>
+                    <div>
+                        <label for="vehicleVIN">VIN #:</label>
+                        <input type="text" id="vehicleVIN" name="vehicleVIN" value="2393923923929399" required>
+                    </div>
+                    <div>
+                        <label for="vehicleReg">Reg #:</label>
+                        <input type="text" id="vehicleReg" name="vehicleReg" value="D-32342" required>
+                    </div>
+                    <div>
+                        <label for="vehicleMileage">Mileage (KM):</label>
+                        <input type="number" id="vehicleMileage" name="vehicleMileage" value="238283" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Vehicle Receiving</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="receivedBy">Received By:</label>
+                        <input type="text" id="receivedBy" name="receivedBy" value="Asif Ali" required>
+                    </div>
+                    <div>
+                        <label for="receivedOn">Received On:</label>
+                        <input type="date" id="receivedOn" name="receivedOn" value="{{currentDate}}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Items</h2>
+                <div id="item-list">
+                    <!-- Item rows will be added here by JavaScript -->
+                    <div class="item-row">
+                        <input type="hidden" name="items[0][id]" value="1">
+                        <div class="flex items-center justify-center">1</div>
+                        <input type="text" name="items[0][description]" placeholder="Item Description" value="AC Compressor" required>
+                        <input type="number" name="items[0][qty]" placeholder="Qty" value="1" min="1" required>
+                        <input type="number" name="items[0][unitPrice]" placeholder="Unit Price" value="100" min="0" step="0.01" required>
+                        <input type="number" name="items[0][vatPercent]" placeholder="VAT%" value="5" min="0" step="0.01" required>
+                        <div class="flex items-center justify-center">AED <span class="vat-amount">5.00</span></div>
+                        <div class="flex items-center justify-center">AED <span class="total-amount">105.00</span></div>
+                        <button type="button" class="delete-item-btn" onclick="deleteItem(this)">Delete</button>
+                    </div>
+                    <div class="item-row">
+                        <input type="hidden" name="items[1][id]" value="2">
+                        <div class="flex items-center justify-center">2</div>
+                        <input type="text" name="items[1][description]" placeholder="Item Description" value="Oil Change" required>
+                        <input type="number" name="items[1][qty]" placeholder="Qty" value="1" min="1" required>
+                        <input type="number" name="items[1][unitPrice]" placeholder="Unit Price" value="200" min="0" step="0.01" required>
+                        <input type="number" name="items[1][vatPercent]" placeholder="VAT%" value="5" min="0" step="0.01" required>
+                        <div class="flex items-center justify-center">AED <span class="vat-amount">10.00</span></div>
+                        <div class="flex items-center justify-center">AED <span class="total-amount">210.00</span></div>
+                        <button type="button" class="delete-item-btn" onclick="deleteItem(this)">Delete</button>
+                    </div>
+                </div>
+                <button type="button" class="add-item-btn" onclick="addItem()">Add Item</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Summary Details</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="discountPercent">Discount (%):</label>
+                        <input type="number" id="discountPercent" name="discountPercent" value="0" min="0" step="0.01">
+                    </div>
+                    <div>
+                        <label for="discountAmount">Discount Price (AED):</label>
+                        <input type="number" id="discountAmount" name="discountAmount" value="0.00" min="0" step="0.01" readonly>
+                    </div>
+                    <div>
+                        <label for="goodsTotal">Goods Total (AED):</label>
+                        <input type="number" id="goodsTotal" name="goodsTotal" value="0.00" min="0" step="0.01" readonly>
+                    </div>
+                    <div>
+                        <label for="vatTotal">VAT Total (AED):</label>
+                        <input type="number" id="vatTotal" name="vatTotal" value="0.00" min="0" step="0.01" readonly>
+                    </div>
+                    <div>
+                        <label for="grandTotal">Grand Total (AED):</label>
+                        <input type="number" id="grandTotal" name="grandTotal" value="0.00" min="0" step="0.01" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Generate PDF Invoice</button>
+        </form>
+    </div>
+
+    <script>
+        let itemCounter = 0;
+
+        // Function to format date as YYYY-MM-DD
+        function formatDate(date) {
+            const d = new Date(date);
+            let month = '' + (d.getMonth() + 1);
+            let day = '' + d.getDate();
+            const year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+
+        // Set current date for date inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = formatDate(new Date());
+            document.getElementById('createdAt').value = today;
+            document.getElementById('receivedOn').value = today;
+            updateTotals(); // Calculate initial totals
+        });
+
+        function addItem() {
+            itemCounter++;
+            const itemList = document.getElementById('item-list');
+            const newItemRow = document.createElement('div');
+            newItemRow.classList.add('item-row');
+            newItemRow.innerHTML = `
+                <input type="hidden" name="items[${itemCounter}][id]" value="${itemCounter + 1}">
+                <div class="flex items-center justify-center">${itemCounter + 1}</div>
+                <input type="text" name="items[${itemCounter}][description]" placeholder="Item Description" required>
+                <input type="number" name="items[${itemCounter}][qty]" placeholder="Qty" value="1" min="1" required oninput="updateTotals()">
+                <input type="number" name="items[${itemCounter}][unitPrice]" placeholder="Unit Price" value="0" min="0" step="0.01" required oninput="updateTotals()">
+                <input type="number" name="items[${itemCounter}][vatPercent]" placeholder="VAT%" value="5" min="0" step="0.01" required oninput="updateTotals()">
+                <div class="flex items-center justify-center">AED <span class="vat-amount">0.00</span></div>
+                <div class="flex items-center justify-center">AED <span class="total-amount">0.00</span></div>
+                <button type="button" class="delete-item-btn" onclick="deleteItem(this)">Delete</button>
+            `;
+            itemList.appendChild(newItemRow);
+            updateItemNumbers();
+            updateTotals();
+        }
+
+        function deleteItem(button) {
+            button.closest('.item-row').remove();
+            updateItemNumbers();
+            updateTotals();
+        }
+
+        function updateItemNumbers() {
+            const itemRows = document.querySelectorAll('#item-list .item-row');
+            itemRows.forEach((row, index) => {
+                row.querySelector('input[type="hidden"]').name = `items[${index}][id]`;
+                row.querySelector('input[type="hidden"]').value = index + 1;
+                row.querySelector('div:first-child').textContent = index + 1;
+
+                // Update names for other inputs to match new index
+                row.querySelector('input[name*="[description]"]').name = `items[${index}][description]`;
+                row.querySelector('input[name*="[qty]"]').name = `items[${index}][qty]`;
+                row.querySelector('input[name*="[unitPrice]"]').name = `items[${index}][unitPrice]`;
+                row.querySelector('input[name*="[vatPercent]"]').name = `items[${index}][vatPercent]`;
+            });
+            itemCounter = itemRows.length - 1; // Adjust counter for next new item
+        }
+
+        function updateTotals() {
+            let goodsTotal = 0;
+            let vatTotal = 0;
+
+            const itemRows = document.querySelectorAll('#item-list .item-row');
+            itemRows.forEach(row => {
+                const qty = parseFloat(row.querySelector('input[name*="[qty]"]').value) || 0;
+                const unitPrice = parseFloat(row.querySelector('input[name*="[unitPrice]"]').value) || 0;
+                const vatPercent = parseFloat(row.querySelector('input[name*="[vatPercent]"]').value) || 0;
+
+                const itemSubtotal = qty * unitPrice;
+                const itemVatAmount = itemSubtotal * (vatPercent / 100);
+                const itemTotal = itemSubtotal + itemVatAmount;
+
+                goodsTotal += itemSubtotal;
+                vatTotal += itemVatAmount;
+
+                row.querySelector('.vat-amount').textContent = itemVatAmount.toFixed(2);
+                row.querySelector('.total-amount').textContent = itemTotal.toFixed(2);
+            });
+
+            const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
+            let discountAmount = goodsTotal * (discountPercent / 100);
+            if (discountAmount > goodsTotal) { // Ensure discount doesn't exceed goods total
+                discountAmount = goodsTotal;
+                document.getElementById('discountPercent').value = (goodsTotal > 0 ? (discountAmount / goodsTotal * 100).toFixed(2) : 0);
+            }
+
+            const grandTotal = (goodsTotal + vatTotal - discountAmount);
+
+            document.getElementById('goodsTotal').value = goodsTotal.toFixed(2);
+            document.getElementById('vatTotal').value = vatTotal.toFixed(2);
+            document.getElementById('discountAmount').value = discountAmount.toFixed(2);
+            document.getElementById('grandTotal').value = grandTotal.toFixed(2);
+        }
+
+        // Attach updateTotals to discount input
+        document.getElementById('discountPercent').addEventListener('input', updateTotals);
+
+        // Initial update for existing items
+        updateItemNumbers();
+        updateTotals();
+    </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{formTitle}}</title>
+    <!-- Tailwind CSS CDN for quick styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            margin-top: 20px; /* Add some margin from the top */
+        }
+        h1 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700; /* font-bold */
+        }
+        .form-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background-color: #f9fafb;
+        }
+        .form-section-title {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600; /* font-semibold */
+            color: #374151;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #d1d5db;
+            padding-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #374151;
+            background-color: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        textarea:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+        .grid-cols-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .item-row {
+            display: grid;
+            grid-template-columns: 0.5fr 3fr 1fr 1fr 1fr 1fr 1fr 0.5fr; /* Adjusted for delete button */
+            gap: 10px;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+        }
+        .item-row input {
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .add-item-btn {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            margin-top: 15px;
+            display: block;
+            width: fit-content;
+        }
+        .add-item-btn:hover {
+            background-color: #16a34a; /* green-600 */
+        }
+        .delete-item-btn {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem; /* text-sm */
+            transition: background-color 0.2s;
+        }
+        .delete-item-btn:hover {
+            background-color: #dc2626; /* red-600 */
+        }
+        button[type="submit"] {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 700;
+            display: block;
+            width: 100%;
+            margin-top: 30px;
+            transition: background-color 0.2s;
+        }
+        button[type="submit"]:hover {
+            background-color: #4338ca; /* indigo-700 */
+        }
+        .message-box {
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        .message-box.success {
+            background-color: #d1fae5; /* green-100 */
+            color: #065f46; /* green-700 */
+        }
+        .message-box.error {
+            background-color: #fee2e2; /* red-100 */
+            color: #991b1b; /* red-700 */
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #4f46e5; /* Blue */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="text-indigo-600 hover:underline mb-4 inline-block">&larr; Back to Main Menu</a>
+        <h1>{{formTitle}}<br><span class="text-xl font-normal text-gray-600">{{arabicFormTitle}}</span></h1>
+        <form id="invoiceForm" action="{{formAction}}">
+            <div class="form-section">
+                <h2 class="form-section-title">Invoice Information</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="invoiceNumber">Invoice #:</label>
+                        <input type="text" id="invoiceNumber" name="invoiceNumber" value="{{newInvoiceNum}}" required>
+                    </div>
+                    <div>
+                        <label for="createdAt">Created At:</label>
+                        <input type="date" id="createdAt" name="createdAt" value="{{currentDate}}" required>
+                    </div>
+                    <div>
+                        <label for="createdBy">Created By:</label>
+                        <input type="text" id="createdBy" name="createdBy" value="{{createdBy}}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Customer Details</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="customerName">Customer Name:</label>
+                        <input type="text" id="customerName" name="customerName" value="{{customerName}}" required>
+                    </div>
+                    <div>
+                        <label for="customerPhone">Phone #:</label>
+                        <input type="text" id="customerPhone" name="customerPhone" value="{{customerPhone}}" required>
+                    </div>
+                    <div>
+                        <label for="customerAddress">Address:</label>
+                        <textarea id="customerAddress" name="customerAddress" rows="2" required>{{customerAddress}}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Vehicle Details</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="vehicleMakeModel">Make/Model:</label>
+                        <input type="text" id="vehicleMakeModel" name="vehicleMakeModel" value="{{vehicleMakeModel}}" required>
+                    </div>
+                    <div>
+                        <label for="vehicleVIN">VIN #:</label>
+                        <input type="text" id="vehicleVIN" name="vehicleVIN" value="{{vehicleVIN}}" required>
+                    </div>
+                    <div>
+                        <label for="vehicleReg">Reg #:</label>
+                        <input type="text" id="vehicleReg" name="vehicleReg" value="{{vehicleReg}}" required>
+                    </div>
+                    <div>
+                        <label for="vehicleMileage">Mileage (KM):</label>
+                        <input type="number" id="vehicleMileage" name="vehicleMileage" value="{{vehicleMileage}}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Vehicle Receiving</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="receivedBy">Received By:</label>
+                        <input type="text" id="receivedBy" name="receivedBy" value="{{receivedBy}}" required>
+                    </div>
+                    <div>
+                        <label for="receivedOn">Received On:</label>
+                        <input type="date" id="receivedOn" name="receivedOn" value="{{currentDate}}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Items</h2>
+                <div id="item-list">
+                    <!-- Item rows will be added here by JavaScript -->
+                    {{{initialItemRows}}}
+                </div>
+                <button type="button" class="add-item-btn" onclick="addItem()">Add Item</button>
+            </div>
+
+            <div class="form-section">
+                <h2 class="form-section-title">Summary Details</h2>
+                <div class="grid-cols-2">
+                    <div>
+                        <label for="discountPercent">Discount (%):</label>
+                        <input type="number" id="discountPercent" name="discountPercent" value="0" min="0" step="0.01">
+                    </div>
+                    <div>
+                        <label for="discountAmount">Discount Price (AED):</label>
+                        <input type="number" id="discountAmount" name="discountAmount" value="0.00" min="0" step="0.01" readonly>
+                    </div>
+                    <div>
+                        <label for="goodsTotal">Goods Total (AED):</label>
+                        <input type="number" id="goodsTotal" name="goodsTotal" value="0.00" min="0" step="0.01" readonly>
+                    </div>
+                    <div>
+                        <label for="vatTotal">VAT Total (AED):</label>
+                        <input type="number" id="vatTotal" name="vatTotal" value="0.00" min="0" step="0.01" readonly>
+                    </div>
+                    <div>
+                        <label for="grandTotal">Grand Total (AED):</label>
+                        <input type="number" id="grandTotal" name="grandTotal" value="0.00" min="0" step="0.01" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Generate PDF Invoice</button>
+            <div id="message-box" class="message-box hidden"></div>
+            <div id="loading-indicator" class="mt-4 hidden">
+                <div class="loading-spinner"></div>
+                <p class="mt-2 text-gray-700">Generating PDF, please wait...</p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let itemCounter = 0;
+
+        // Function to format date as YYYY-MM-DD
+        function formatDate(date) {
+            const d = new Date(date);
+            let month = '' + (d.getMonth() + 1);
+            let day = '' + d.getDate();
+            const year = d.getFullYear();
+
+            if (month.length < 2) month = '0' + month;
+            if (day.length < 2) day = '0' + day;
+
+            return [year, month, day].join('-');
+        }
+
+        // Set current date for date inputs and update totals on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = formatDate(new Date());
+            updateItemNumbers(); // Ensure initial item numbers are correct
+            updateTotals(); // Calculate initial totals
+            
+            // Attach event listeners to initial numeric inputs for real-time calculation
+            document.querySelectorAll('#item-list .item-row input[type="number"]').forEach(input => {
+                input.addEventListener('input', updateTotals);
+            });
+        });
+
+        function addItem() {
+            const itemList = document.getElementById('item-list');
+            const existingItems = document.querySelectorAll('#item-list .item-row').length;
+            itemCounter = existingItems; // Use current number of items as the index for the new one
+
+            const newItemRow = document.createElement('div');
+            newItemRow.classList.add('item-row');
+            newItemRow.innerHTML = `
+                <input type="hidden" name="items[${itemCounter}][id]" value="${itemCounter + 1}">
+                <div class="flex items-center justify-center">${itemCounter + 1}</div>
+                <input type="text" name="items[${itemCounter}][description]" placeholder="Item Description" required>
+                <input type="number" name="items[${itemCounter}][qty]" placeholder="Qty" value="1" min="1" required oninput="updateTotals()">
+                <input type="number" name="items[${itemCounter}][unitPrice]" placeholder="Unit Price" value="0" min="0" step="0.01" required oninput="updateTotals()">
+                <input type="number" name="items[${itemCounter}][vatPercent]" placeholder="VAT%" value="5" min="0" step="0.01" required oninput="updateTotals()">
+                <div class="flex items-center justify-center">AED <span class="vat-amount">0.00</span></div>
+                <div class="flex items-center justify-center">AED <span class="total-amount">0.00</span></div>
+                <button type="button" class="delete-item-btn" onclick="deleteItem(this)">Delete</button>
+            `;
+            itemList.appendChild(newItemRow);
+            updateItemNumbers();
+            updateTotals();
+        }
+
+        function deleteItem(button) {
+            button.closest('.item-row').remove();
+            updateItemNumbers();
+            updateTotals();
+        }
+
+        function updateItemNumbers() {
+            const itemRows = document.querySelectorAll('#item-list .item-row');
+            itemRows.forEach((row, index) => {
+                // Update the hidden ID and displayed number
+                row.querySelector('input[type="hidden"]').name = `items[${index}][id]`;
+                row.querySelector('input[type="hidden"]').value = index + 1;
+                row.querySelector('div:first-child').textContent = index + 1;
+
+                // Update names for other inputs to match new index for server-side parsing
+                row.querySelector('input[name*="[description]"]').name = `items[${index}][description]`;
+                row.querySelector('input[name*="[qty]"]').name = `items[${index}][qty]`;
+                row.querySelector('input[name*="[unitPrice]"]').name = `items[${index}][unitPrice]`;
+                row.querySelector('input[name*="[vatPercent]"]').name = `items[${index}][vatPercent]`;
+            });
+            // Reset itemCounter to the last valid index for adding new items
+            itemCounter = itemRows.length > 0 ? itemRows.length - 1 : -1;
+        }
+
+        function updateTotals() {
+            let goodsTotal = 0;
+            let vatTotal = 0;
+
+            const itemRows = document.querySelectorAll('#item-list .item-row');
+            itemRows.forEach(row => {
+                const qty = parseFloat(row.querySelector('input[name*="[qty]"]').value) || 0;
+                const unitPrice = parseFloat(row.querySelector('input[name*="[unitPrice]"]').value) || 0;
+                const vatPercent = parseFloat(row.querySelector('input[name*="[vatPercent]"]').value) || 0;
+
+                const itemSubtotal = qty * unitPrice;
+                const itemVatAmount = itemSubtotal * (vatPercent / 100);
+                const itemTotal = itemSubtotal + itemVatAmount;
+
+                goodsTotal += itemSubtotal;
+                vatTotal += itemVatAmount;
+
+                row.querySelector('.vat-amount').textContent = itemVatAmount.toFixed(2);
+                row.querySelector('.total-amount').textContent = itemTotal.toFixed(2);
+            });
+
+            const discountPercentInput = document.getElementById('discountPercent');
+            const discountAmountInput = document.getElementById('discountAmount');
+
+            const discountPercent = parseFloat(discountPercentInput.value) || 0;
+            let discountAmount = goodsTotal * (discountPercent / 100);
+
+            // Ensure discount doesn't exceed goods total
+            if (discountAmount > goodsTotal) {
+                discountAmount = goodsTotal;
+                discountPercentInput.value = (goodsTotal > 0 ? (discountAmount / goodsTotal * 100).toFixed(2) : 0);
+            }
+
+            const grandTotal = (goodsTotal + vatTotal - discountAmount);
+
+            document.getElementById('goodsTotal').value = grandTotal >= 0 ? goodsTotal.toFixed(2) : '0.00';
+            document.getElementById('vatTotal').value = grandTotal >= 0 ? vatTotal.toFixed(2) : '0.00';
+            discountAmountInput.value = grandTotal >= 0 ? discountAmount.toFixed(2) : '0.00';
+            document.getElementById('grandTotal').value = grandTotal >= 0 ? grandTotal.toFixed(2) : '0.00';
+        }
+
+        // Attach updateTotals to discount input
+        document.getElementById('discountPercent').addEventListener('input', updateTotals);
+
+        // --- Form submission with fetch API ---
+        const invoiceForm = document.getElementById('invoiceForm');
+        const messageBox = document.getElementById('message-box');
+        const loadingIndicatorDiv = document.getElementById('loading-indicator');
+
+        invoiceForm.addEventListener('submit', submitForm);
+
+        async function submitForm(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            messageBox.classList.add('hidden'); // Hide any previous messages
+            loadingIndicatorDiv.classList.remove('hidden'); // Show loading spinner
+
+            const formData = new FormData(invoiceForm);
+            const data = {};
+            // Manually process form data to handle array of items correctly
+            for (let [key, value] of formData.entries()) {
+                if (key.startsWith('items[')) {
+                    const match = key.match(/items\[(\d+)\]\[(.*)\]/);
+                    if (match) {
+                        const index = parseInt(match[1]);
+                        const field = match[2];
+                        if (!data.items) {
+                            data.items = [];
+                        }
+                        if (!data.items[index]) {
+                            data.items[index] = {};
+                        }
+                        data.items[index][field] = value;
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+
+            // Ensure numeric values are numbers, not strings
+            data.goodsTotal = parseFloat(document.getElementById('goodsTotal').value);
+            data.vatTotal = parseFloat(document.getElementById('vatTotal').value);
+            data.discountPercent = parseFloat(document.getElementById('discountPercent').value);
+            data.discountAmount = parseFloat(document.getElementById('discountAmount').value);
+            data.grandTotal = parseFloat(document.getElementById('grandTotal').value);
+
+            const formAction = invoiceForm.action; // Get the action URL from the server-rendered value
+
+            try {
+                const response = await fetch(formAction, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    // It's a PDF response, so handle the download
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    // Get filename from Content-Disposition header if available
+                    const contentDisposition = response.headers.get('Content-Disposition');
+                    let filename = 'invoice.pdf';
+                    if (contentDisposition && contentDisposition.includes('filename=')) {
+                        filename = contentDisposition.split('filename=')[1].replace(/"/g, '');
+                    }
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+
+                    showMessage('PDF generated successfully! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/'; // Redirect to main page
+                    }, 2000); // Redirect after 2 seconds
+                } else {
+                    const errorText = await response.text();
+                    showMessage(`Error generating PDF: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                console.error('Network or other error:', error);
+                showMessage('An unexpected error occurred. Please try again.', 'error');
+            } finally {
+                loadingIndicatorDiv.classList.add('hidden'); // Hide loading spinner
+            }
+        }
+
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = `message-box ${type}`; // Reset classes and add new ones
+            messageBox.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
