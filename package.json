@@ -2,17 +2,19 @@
   "name": "invoice-generator",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npm install puppeteer --prefix ./node_modules/puppeteer --ignore-scripts --no-audit && node ./node_modules/puppeteer/install.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^2.2.0",
-    "express": "^5.1.0",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
     "nedb": "^1.8.0",
-    "puppeteer": "^24.11.2"
+    "puppeteer": "^22.12.0"
   }
 }
