@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer'); // Ensure this is 'puppeteer', not 'puppeteer-core'
 const path = require('path');
 const fs = require('fs');
 const Datastore = require('nedb'); // Import NeDB
@@ -83,7 +83,7 @@ app.get('/', (req, res) => {
 
 // Route to serve the invoice input form (Estimates)
 app.get('/generate-estimate-form', async (req, res) => {
-    const currentDate = new Date().toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    const currentDate = new Date().toISOString().split('T')[0]; // Format asYYYY-MM-DD
     const newInvoiceNum = `EST-${Math.floor(10000 + Math.random() * 90000)}`; // Random for estimates
 
     let html = await renderHtmlTemplate(path.join(__dirname, 'invoice_form_template.html'), {
@@ -133,7 +133,7 @@ app.get('/generate-estimate-form', async (req, res) => {
 
 // Route to serve the invoice input form (Tax Invoice - sequential numbering & history)
 app.get('/generate-invoice-form', async (req, res) => {
-    const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const currentDate = new Date().toISOString().split('T')[0]; // Format asYYYY-MM-DD
     const newInvoiceNum = await getNextInvoiceNumber(); // Sequential for tax invoices
 
     let html = await renderHtmlTemplate(path.join(__dirname, 'invoice_form_template.html'), {
@@ -277,7 +277,8 @@ async function generateAndSendPdf(invoiceData, res) {
     try {
         browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            // Add these arguments for headless Chrome in containerized environments
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--single-process', '--no-zygote']
         });
         const page = await browser.newPage();
 
